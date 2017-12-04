@@ -1,10 +1,11 @@
+gT
 - name: Configure PostgreSQL streaming replication
   hosts: database_slave
 
   pre_tasks:
     - name: Remove recovery.conf
       file:
-        path: /var/lib/pgsql/9.4/data/recovery.conf
+        path: "/var/lib/pgsql/{{ postgres_version}}/data/recovery.conf"
         state: absent
 
     - name: Add slave to database group
@@ -15,6 +16,12 @@
         - always
 
   roles:
+    - role: nginx
+      nginx_exec_vars_only: true
+
+    - role: repos_el
+      when: ansible_os_family == "RedHat"
+
     - role: packages_el
       packages_el_install_tower: false
       packages_el_install_postgres: true
